@@ -1,0 +1,41 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <view class="logo-section">
+    <view class="logo">澪</view>
+    <text class="app-name">Mio Chat</text>
+  </view>
+
+  <view class="form-section">
+    <view class="form-item">
+      <input
+        class="input"
+        type="text"
+        placeholder="用户名"
+        placeholder-class="input-placeholder"
+        value="{{username}}"
+        bindinput="onUsernameInput"
+        disabled="{{loading}}"
+      />
+    </view>
+
+    <view class="form-item">
+      <input
+        class="input"
+        type="password"
+        placeholder="密码"
+        placeholder-class="input-placeholder"
+        value="{{password}}"
+        bindinput="onPasswordInput"
+        disabled="{{loading}}"
+      />
+    </view>
+
+    <button
+      class="btn-primary login-btn"
+      bindtap="onLogin"
+      disabled="{{loading || !username || !password}}"
+    >
+      {{loading ? '登录中...' : '登录'}}
+    </button>
+  </view>
+</view>

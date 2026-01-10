@@ -1,0 +1,74 @@
+<!--pages/chat/chat.wxml-->
+<view class="chat-container">
+  <!-- 额度信息 -->
+  <view class="usage-bar" wx:if="{{usage}}">
+    <text class="usage-text">今日已用: {{usage.used_today}} / {{usage.max_today}}</text>
+    <text class="usage-remaining">剩余: {{usage.remaining_today}}</text>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view
+    class="message-list"
+    scroll-y
+    scroll-into-view="{{scrollToView}}"
+    scroll-with-animation
+  >
+    <view class="message-wrapper">
+      <!-- 空状态 -->
+      <view class="empty-chat" wx:if="{{!messages.length && !sending}}">
+        <text class="empty-chat-text">开始新对话</text>
+      </view>
+
+      <!-- 消息 -->
+      <view
+        class="message-item {{item.role === 'user' ? 'message-user' : 'message-assistant'}}"
+        wx:for="{{messages}}"
+        wx:key="index"
+        id="msg-{{index}}"
+      >
+        <view class="message-avatar">
+          <text wx:if="{{item.role === 'user'}}">我</text>
+          <image wx:else src="/assets/images/mio.png" class="avatar-image" />
+        </view>
+        <view class="message-content">
+          <text class="message-text" user-select>{{item.content}}</text>
+        </view>
+      </view>
+
+      <!-- 加载中 -->
+      <view class="message-item message-assistant" wx:if="{{sending}}" id="msg-loading">
+        <view class="message-avatar">
+          <image src="/assets/images/mio.png" class="avatar-image" />
+        </view>
+        <view class="message-content">
+          <text class="message-text loading-dots">思考中...</text>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区域 -->
+  <view class="input-area">
+    <view class="input-wrapper">
+      <input
+        class="message-input"
+        type="text"
+        placeholder="输入消息..."
+        placeholder-class="input-placeholder"
+        value="{{inputValue}}"
+        bindinput="onInputChange"
+        bindconfirm="onSend"
+        disabled="{{sending}}"
+        confirm-type="send"
+        adjust-position="{{true}}"
+      />
+      <button
+        class="send-btn {{(!inputValue || sending) ? 'send-btn-disabled' : ''}}"
+        bindtap="onSend"
+        disabled="{{!inputValue || sending}}"
+      >
+        发送
+      </button>
+    </view>
+  </view>
+</view>

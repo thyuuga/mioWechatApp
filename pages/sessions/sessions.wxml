@@ -1,0 +1,43 @@
+<!--pages/sessions/sessions.wxml-->
+<view class="sessions-container">
+  <!-- 顶部操作栏 -->
+  <view class="header">
+    <text class="title">会话列表</text>
+    <view class="new-btn" bindtap="onNewChat">
+      <text class="new-btn-text">+ 新会话</text>
+    </view>
+  </view>
+
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:elif="{{!sessions.length}}">
+    <text class="empty-text">暂无会话</text>
+    <text class="empty-hint">点击右上角开始新会话</text>
+  </view>
+
+  <!-- 会话列表 -->
+  <scroll-view class="session-list" scroll-y wx:else>
+    <view
+      class="session-item"
+      wx:for="{{sessions}}"
+      wx:key="id"
+      bindtap="onSessionTap"
+      data-id="{{item.id}}"
+    >
+      <view class="session-info">
+        <text class="session-title">{{item.title || '未命名会话'}}</text>
+        <text class="session-time">{{item.updatedAtFormatted}}</text>
+      </view>
+      <view class="session-arrow">></view>
+    </view>
+  </scroll-view>
+
+  <!-- 退出登录 -->
+  <view class="logout-section">
+    <button class="logout-btn" bindtap="onLogout">退出登录</button>
+  </view>
+</view>
