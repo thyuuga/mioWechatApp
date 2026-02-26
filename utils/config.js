@@ -10,11 +10,11 @@
 
 const config = {
   // API 基础地址，请替换为实际域名或局域网 IP
-  API_BASE: 'https://cat.thyuuga.com',
+  API_BASE: 'https://mio.thyuuga.com',
   // API_BASE: 'https://your-domain.com',
 
   // API 前缀
-  API_PREFIX: '/cat'
+  API_PREFIX: '/mio'
 }
 
 module.exports = config

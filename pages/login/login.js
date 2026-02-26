@@ -35,26 +35,27 @@ Page({
 
     try {
       const res = await request.post('/auth/login', { username, password }, true)
+      console.log('Login response:', res)
 
-      // 适配不同的返回字段：access_token 或 token
-      const token = res.access_token || res.token
-
-      if (!token) {
+      // 适配不同的返回格式
+      if (res.ok && res.token) {
+        console.log('Saving token:', res.token)
+        auth.setToken(res.token)
+      } else if (res.access_token) {
+        auth.setToken(res.access_token)
+      } else {
         throw new Error('登录返回数据异常')
       }
-
-      // 保存 token
-      auth.setToken(token)
 
       wx.showToast({
         title: '登录成功',
         icon: 'success'
       })
 
-      // 跳转到会话列表
+      // 跳转到聊天页面
       setTimeout(() => {
         wx.reLaunch({
-          url: '/pages/sessions/sessions'
+          url: '/pages/chat/chat'
         })
       }, 500)
     } catch (err) {

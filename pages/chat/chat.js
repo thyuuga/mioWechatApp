@@ -11,21 +11,57 @@ Page({
     inputValue: '',
     sending: false,
     scrollToView: '',
-    usage: null
+    loading: false
   },
 
-  onLoad(options) {
+  async onLoad(options) {
     if (options.session_id) {
+      // 如果有指定 session_id，直接加载
       const sid = options.session_id
-      const history = wx.getStorageSync(`messages_${sid}`) || []
+      this.setData({ sessionId: sid })
+      this.loadHistory(sid)
+    } else {
+      // 否则自动获取最近的 session
+      await this.loadLatestSession()
+    }
+  },
 
+  async loadLatestSession() {
+    this.setData({ loading: true })
+    try {
+      const res = await request.get('/sessions')
+      const sessions = Array.isArray(res) ? res : (res.sessions || [])
+
+      if (sessions.length > 0) {
+        // 取最近的 session（假设列表按时间排序）
+        const latestSession = sessions[0]
+        this.setData({ sessionId: latestSession.id })
+        await this.loadHistory(latestSession.id)
+      }
+    } catch (err) {
+      console.error('Load latest session failed:', err)
+    } finally {
+      this.setData({ loading: false })
+    }
+  },
+
+  async loadHistory(sessionId) {
+    this.setData({ loading: true })
+    try {
+      const res = await request.get(`/sessions/${sessionId}`)
+      const messages = res.messages || []
       this.setData({
-        sessionId: sid,
-        messages: history,
-        scrollToView: history.length
-          ? `msg-${history.length - 1}`
-          : ''
+        messages,
+        scrollToView: messages.length ? `msg-${messages.length - 1}` : ''
       })
+    } catch (err) {
+      console.error('Load history failed:', err)
+      wx.showToast({
+        title: '加载历史记录失败',
+        icon: 'none'
+      })
+    } finally {
+      this.setData({ loading: false })
     }
   },
 
@@ -49,9 +85,6 @@ Page({
       scrollToView: `msg-${newMessages.length - 1}`
     })
 
-    // ✅ 先暂存（如果还没有 sessionId，就存 temp）
-    wx.setStorageSync(`messages_${sessionId || 'temp'}`, newMessages)
-
     try {
       // 如果还没有 sessionId，先创建一个
       let sid = sessionId
@@ -59,16 +92,9 @@ Page({
         const created = await request.post('/sessions', {})
         sid = created.id
         this.setData({ sessionId: sid })
-
-        // ✅ 把 temp 消息迁移到真正的 sessionId
-        const tempMessages = wx.getStorageSync('messages_temp') || []
-        if (tempMessages.length) {
-          wx.setStorageSync(`messages_${sid}`, tempMessages)
-          wx.removeStorageSync('messages_temp')
-        }
       }
 
-      // 真正发送聊天
+      // 发送聊天
       const res = await request.post('/chat', {
         message: userMessage,
         sessionId: sid
@@ -84,9 +110,6 @@ Page({
         sending: false,
         scrollToView: `msg-${updatedMessages.length - 1}`
       })
-
-      // ✅ 存最终版本（包含 assistant 回复）
-      wx.setStorageSync(`messages_${sid}`, updatedMessages)
 
     } catch (err) {
       console.error('Send message failed:', err)

@@ -3,9 +3,6 @@
   <!-- 顶部操作栏 -->
   <view class="header">
     <text class="title">会话列表</text>
-    <view class="new-btn" bindtap="onNewChat">
-      <text class="new-btn-text">+ 新会话</text>
-    </view>
   </view>
 
   <!-- 加载中 -->
@@ -16,7 +13,6 @@
   <!-- 空状态 -->
   <view class="empty" wx:elif="{{!sessions.length}}">
     <text class="empty-text">暂无会话</text>
-    <text class="empty-hint">点击右上角开始新会话</text>
   </view>
 
   <!-- 会话列表 -->

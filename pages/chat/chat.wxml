@@ -14,8 +14,13 @@
     scroll-with-animation
   >
     <view class="message-wrapper">
+      <!-- 加载历史记录中 -->
+      <view class="empty-chat" wx:if="{{loading}}">
+        <text class="empty-chat-text">加载中...</text>
+      </view>
+
       <!-- 空状态 -->
-      <view class="empty-chat" wx:if="{{!messages.length && !sending}}">
+      <view class="empty-chat" wx:elif="{{!messages.length && !sending}}">
         <text class="empty-chat-text">开始新对话</text>
       </view>
 

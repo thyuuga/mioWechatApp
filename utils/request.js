@@ -28,9 +28,10 @@ function request(options) {
       'Content-Type': 'application/json'
     }
 
-    // 添加 token
+    // 添加 Authorization header
     if (!noToken) {
       const token = auth.getToken()
+      console.log('Request token:', token ? token.substring(0, 8) + '...' : 'none')
       if (token) {
         header['Authorization'] = `Bearer ${token}`
       }
@@ -42,23 +43,7 @@ function request(options) {
       data,
       header,
       success(res) {
-        // 处理 401 未授权
-        if (res.statusCode === 401) {
-          auth.clearToken()
-          wx.reLaunch({
-            url: '/pages/login/login'
-          })
-          reject(new Error('未授权，请重新登录'))
-          return
-        }
-
-        // 处理其他错误状态码
-        if (res.statusCode >= 400) {
-          const errMsg = res.data?.message || res.data?.error || '请求失败'
-          reject(new Error(errMsg))
-          return
-        }
-
+        // 注：当前服务端不校验状态码，直接返回数据
         resolve(res.data)
       },
       fail(err) {
